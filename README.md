@@ -1,6 +1,6 @@
 Introduction:
 ===
-It's navie implementation of basket, It has a restful api and simple twig and jquery.
+It's navie implementation of basket, It has a restful api and simple twig and jquery. I commited `.env ` just make it simpler to start.
 
 How to start:
 ===
