@@ -4,7 +4,7 @@ It's navie implementation of basket, It has a restful api and simple twig and jq
 
 How to start:
 ===
-before everything you need to run: 
+before everything you need to run commands in order: 
 
 > php bin/console doctrine:database:create  
 
