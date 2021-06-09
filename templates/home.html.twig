@@ -1,0 +1,180 @@
+<html>
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+    <style type="text/css">
+    .tg  {border-collapse:collapse;border-spacing:0;}
+    .tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+        overflow:hidden;padding:10px 5px;word-break:normal;}
+    .tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+        font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+    .tg .tg-0pky{border-color:inherit;text-align:left;vertical-align:top}
+    .tg .tg-0lax{text-align:left;vertical-align:top}
+</style>
+    <title>test</title>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-4">
+            <table>
+                <tr>
+                    <td>Single selection</td>
+                    <td><input type='text' id='product'></td>
+                </tr>
+            </table>
+            <table class="tg" id="free">
+                <thead>
+                <tr>
+                    <th class="tg-0lax" colspan="6"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="tg-0lax" rowspan="5"></td>
+                    <td class="tg-0lax" colspan="4" rowspan="2"><img id="img" src="" /></td>
+                    <td class="tg-0lax" rowspan="5"></td>
+                </tr>
+                <tr>
+                </tr>
+                <tr>
+                    <td class="tg-0lax">name</td>
+                    <td class="tg-0lax" id="name" colspan="3"></td>
+                </tr>
+                <tr>
+                    <td class="tg-0lax">count</td>
+                    <td class="tg-0lax" colspan="3"><input id="count" type="number" value=""></td>
+                </tr>
+                <tr>
+                    <td class="tg-0lax">price</td>
+                    <td class="tg-0lax" id="pricey" colspan="3"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        <button type="button" id="btn" class="btn btn-success">add to basket</button>
+                    </td>
+                    <td>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-sm-8">
+            {%  if error is not null %}
+            <div  class="btn btn-danger">{{ error}}</div>
+            {%  endif %}
+            {%  if items is not null %}
+                <table class="tg">
+                    <thead>
+                    <tr>
+                        <th class="tg-0pky">Basket</th>
+                    </tr>
+                    <tr>
+                        <td class="tg-0pky" >Items in basket:</td>
+
+                    </tr>
+                    <tr>
+                        <td class="tg-0pky">row</td>
+                        <td class="tg-0pky">name</td>
+                        <td class="tg-0pky">price</td>
+                        <td class="tg-0pky">count</td>
+                        <td class="tg-0lax">remove</td>
+                    </tr>
+
+                    {%  set count  = 1 %}
+                    {%  set price  = 0 %}
+                    {% for item in items %}
+                        <tr>
+                            <td class="tg-0pky">{{ count }}</td>
+                            <td class="tg-0pky"><span style="font-weight:400;font-style:normal">{{ item.product.name }}</span></td>
+                            <td class="tg-0pky">{{ item.product.price.amount }}</td>
+                            <td class="tg-0pky">{{ item.quantity.amount }}</td>
+                            <td class="tg-0lax"><a href="/basket/remove/{{ item.product.id }}?count=1"> remove</a></td>
+                        </tr>
+                        {%  set count  = count + 1 %}
+                        {%  set price  = item.product.price.amount + price %}
+                    {% endfor %}
+
+                    <tr>
+                        <td class="tg-0pky">count all:</td>
+                        <td class="tg-0pky" > {{ count }}</td>
+                    </tr>
+                    <tr>
+                        <td class="tg-0pky">whole price:</td>
+                        <td class="tg-0pky">{{ price }}</td>
+                    </tr>
+                    </thead>
+                </table>
+            {% else %}
+                basket is empty
+            {%  endif %}
+        </div>
+    </div>
+
+</div>
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+
+<script>
+
+    $('#free').hide();
+    $("#product" ).autocomplete({
+        source: function( request, response ) {
+            $.ajax({
+                url: "api/products?name=" + name,
+                method: "get",
+                dataType: 'json',
+                data: {
+                    search: request.term
+                },
+                success: function( data ) {
+                    response( data );
+                },
+                error: function (err) {
+                    // alert(err);
+                }
+            });
+        },
+        select: function (event, ui) {
+            $('#free').show();
+            $('#btn').click(function (event) {
+                event.preventDefault();
+                window.location = 'basket/add/'+ ui.item.id +'?count=' + $('#count').val() ;
+            });
+            $('#name').html(ui.item.name);
+            $('#img').attr("src", {{ asset('images/') }} + ui.item.image.contentUrl);
+            // Set selection
+            $('#product').val(ui.item.name); // display the selected text
+            $('#count').val(ui.item.stock.amount); // display the selected text
+            $('#pricey').html(ui.item.price.amount); // display the selected text
+            $('#selectuser_id').val(ui.item.value); // save selected id to input
+            return false;
+        },
+        focus: function(event, ui){
+            $( "#autocomplete" ).val( ui.item.label );
+            $( "#selectuser_id" ).val( ui.item.value );
+            return false;
+        },
+        response: function( event, ui ) {
+            Object.keys(ui).forEach(key => {// the name of the current key.
+                ui[key].forEach(function (index, value) {
+                    ui[key][value].label = index.name
+                })
+            });
+
+        }
+
+    });
+    function split( val ) {
+        return val.split( /,\s*/ );
+    }
+    function extractLast( term ) {
+        return split( term ).pop();
+    }
+</script>
+</body>
+</html>

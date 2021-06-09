@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+  <entity name="App\Domain\Item" table="item">
+    <lifecycle-callbacks>
+      <lifecycle-callback type="prePersist" method="validateQuantity"/>
+      <lifecycle-callback type="preUpdate" method="validateQuantity"/>
+    </lifecycle-callbacks>
+    <indexes>
+      <index name="IDX_1F1B251E1BE1FB52" columns="basket_id"/>
+      <index name="IDX_1F1B251E4584665A" columns="product_id"/>
+    </indexes>
+    <id name="id" type="integer" column="id">
+      <generator strategy="IDENTITY"/>
+    </id>
+    <field name="price" type="money" column="price" precision="10" scale="0" nullable="false">
+      <options>
+        <option name="unsigned"/>
+      </options>
+    </field>
+    <field name="quantity" type="quantity" column="quantity" nullable="false">
+      <options>
+        <option name="unsigned"/>
+      </options>
+    </field>
+    <many-to-one field="basket" target-entity="Basket" >
+      <join-columns>
+        <join-column name="basket_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+    <many-to-one field="product" target-entity="Product" >
+      <join-columns>
+        <join-column name="product_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+  </entity>
+</doctrine-mapping>
